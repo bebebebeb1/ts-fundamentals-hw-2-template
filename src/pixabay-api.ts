@@ -1,18 +1,25 @@
-import axios from "axios";
-import type { PixabayResponse } from "./types/pixabay";
-import { PER_PAGE } from "./pagination";
+import axios, { AxiosResponse } from 'axios';
+import type { PixabayResponse } from './types/pixabay';
 
-export const getImagesByQuery = async (query, page) => {
-  const response = await axios.get(`https://pixabay.com/api/`, {
+const BASE_URL = 'https://pixabay.com/api/';
+const API_KEY = 'YOUR_API_KEY';
+const PER_PAGE = 40;
+
+export async function getImagesByQuery(
+  query: string,
+  page: number
+): Promise<PixabayResponse> {
+  const response: AxiosResponse<PixabayResponse> = await axios.get(BASE_URL, {
     params: {
+      key: API_KEY,
       q: query,
+      image_type: 'photo',
+      orientation: 'horizontal',
+      safesearch: true,
       page,
       per_page: PER_PAGE,
-      image_type: "photo",
-      orientation: "horizontal",
-      safesearch: true,
-      key: import.meta.env.VITE_PIXABAY_API_KEY,
     },
   });
+
   return response.data;
-};
+}
