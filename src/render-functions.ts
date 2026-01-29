@@ -1,77 +1,70 @@
-import iziToast from "izitoast";
-import SimpleLightbox from "simplelightbox";
-import type { PixabayImage } from "./types/pixabay";
-import "izitoast/dist/css/iziToast.min.css";
-import "simplelightbox/dist/simple-lightbox.min.css";
+import SimpleLightbox from 'simplelightbox';
+import type { PixabayImage } from './types/pixabay';
 
-type RenderAPI = {};
+export type RenderElements = {
+  gallery: HTMLDivElement;
+  loader: HTMLDivElement;
+  loadMoreBtn: HTMLButtonElement;
+};
 
-type RenderElements = {};
+export type RenderAPI = {
+  clearGallery: () => void;
+  createGallery: (images: PixabayImage[]) => void;
+  showLoader: () => void;
+  hideLoader: () => void;
+  showLoadMore: () => void;
+  hideLoadMore: () => void;
+};
 
 export function initRender(elements: RenderElements): RenderAPI {
-  const { gallery, loader, loadMoreButton } = elements;
+  const { gallery, loader, loadMoreBtn } = elements;
 
-  // initial UI state
-  loader.style.display = "none";
-  loadMoreButton.style.display = "none";
-
-  const lightbox = new SimpleLightbox(".gallery a", {
-    captionsData: "alt",
+  const lightbox = new SimpleLightbox('.gallery a', {
+    captions: true,
+    captionsData: 'alt',
     captionDelay: 250,
   });
 
-  const createGallery = (images) => {
-    const galleryItems = images
+  function clearGallery(): void {
+    gallery.innerHTML = '';
+  }
+
+  function createGallery(images: PixabayImage[]): void {
+    const markup = images
       .map(
-        (image) => `
-          <a href="${image.largeImageURL}">
-            <img
-              src="${image.webformatURL}"
-              alt="${image.tags}"
-              title="${image.tags}"
-              width="100"
-              height="100"
-              loading="lazy"
-            />
-          </a>`
+        image => `
+        <a href="${image.largeImageURL}">
+          <img src="${image.webformatURL}" alt="${image.tags}" />
+        </a>`
       )
-      .join("");
+      .join('');
 
-    gallery.insertAdjacentHTML("beforeend", galleryItems);
+    gallery.insertAdjacentHTML('beforeend', markup);
     lightbox.refresh();
-  };
+  }
 
-  const clearGallery = () => {
-    gallery.innerHTML = "";
-  };
+  function showLoader(): void {
+    loader.classList.remove('hidden');
+  }
 
-  const showLoader = () => {
-    loader.style.display = "block";
-  };
+  function hideLoader(): void {
+    loader.classList.add('hidden');
+  }
 
-  const hideLoader = () => {
-    loader.style.display = "none";
-  };
+  function showLoadMore(): void {
+    loadMoreBtn.classList.remove('hidden');
+  }
 
-  const showLoadMoreButton = () => {
-    loadMoreButton.style.display = "block";
-  };
-
-  const hideLoadMoreButton = () => {
-    loadMoreButton.style.display = "none";
-  };
-
-  const showToast = (text: string) => {
-    iziToast.info({ message: text, position: "topRight" });
-  };
+  function hideLoadMore(): void {
+    loadMoreBtn.classList.add('hidden');
+  }
 
   return {
-    createGallery,
     clearGallery,
+    createGallery,
     showLoader,
     hideLoader,
-    showLoadMoreButton,
-    hideLoadMoreButton,
-    showToast,
+    showLoadMore,
+    hideLoadMore,
   };
 }
